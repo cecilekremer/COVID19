@@ -210,21 +210,24 @@ hist(xs)
 mean(xs); quantile(xs, c(0.025,0.5,0.975))
 sd(xs)
 
-## Proportion asymptomatic transmission
+# Proportion asymptomatic transmission
+
+n=1000
+
+inc2=rgamma(n,shape=5.2^2/(2.8^2),rate = 5.2/(2.8^2))
+
 ci.fxn <- function(mean.gi.sample, var.gi.sample){
   xg.sample <- rgamma(n,shape=mean.gi.sample^2/var.gi.sample,rate=mean.gi.sample/var.gi.sample)
   mean(xg.sample<inc2)  
 }
 
-n=1000000
-
 distr.p <- c()
-Nresamples <- 500
+Nresamples <- nrow(Savetheta)
 progressbar <- txtProgressBar(min = 0, max = Nresamples, style = 3)
 for (k in 1:Nresamples){
   set.seed(k*245+98)
-  m <- runif(1, min(Savetheta[,1]), max(Savetheta[,1]))    
-  v <- runif(1, min(Savetheta[,2]), max(Savetheta[,2]))  
+  m <- Savetheta[k,1] 
+  v <- Savetheta[k,2] 
   distr.p <- c(distr.p, ci.fxn(m, v))
   setTxtProgressBar(progressbar, k)
 }
@@ -246,17 +249,16 @@ growth.rate <- lm(log(I) ~ t)
 r <- coef(growth.rate)[2]
 
 distr.r <- c()
-Nresamples <- 5000
+Nresamples <- nrow(Savetheta)
 progressbar <- txtProgressBar(min = 0, max = Nresamples, style = 3)
 for (j in 1:Nresamples){
   set.seed(j*245+98)
-  m <- runif(1, min(Savetheta[,1]), max(Savetheta[,1]))  
-  v <- runif(1, min(Savetheta[,2]), max(Savetheta[,2]))     
+  m <- Savetheta[j,1] 
+  v <- Savetheta[j,2]    
   distr.r <- c(distr.r, exp(r*m-0.5*r^2*v))
   setTxtProgressBar(progressbar, j)
 }
 close(progressbar)
 
+
 quantile(distr.r, c(0.025, 0.5, 0.975))
-
-
