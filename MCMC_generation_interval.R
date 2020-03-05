@@ -162,7 +162,53 @@ hist(xs)
 mean(xs); quantile(xs, c(0.025,0.5,0.975))
 sd(xs)
 
-# Proportion asymptomatic transmission
-mean(xg<inc2)
+## Proportion asymptomatic transmission
+ci.fxn <- function(mean.gi.sample, var.gi.sample){
+  xg.sample <- rgamma(n,shape=mean.gi.sample^2/var.gi.sample,rate=mean.gi.sample/var.gi.sample)
+  mean(xg.sample<inc2)  
+}
+
+n=1000000
+
+distr.p <- c()
+Nresamples <- 500
+progressbar <- txtProgressBar(min = 0, max = Nresamples, style = 3)
+for (k in 1:Nresamples){
+  set.seed(k*245+98)
+  m <- runif(1, min(Savetheta[,1]), max(Savetheta[,1]))    
+  v <- runif(1, min(Savetheta[,2]), max(Savetheta[,2]))  
+  distr.p <- c(distr.p, ci.fxn(m, v))
+  setTxtProgressBar(progressbar, k)
+}
+close(progressbar)
+
+quantile(distr.p, c(0.025, 0.5, 0.975))
+
+## Calculating R0
+
+Time <- c(1,1,3,4,5,4,4,4,1,7,6,8,8,10,3,10,10,9,5,13,10,4,8,12,16,8,1,3,13,10,7,10,4,10,14,9,10,12,12,10,11,16,17,12,14,18,15,18,21,21,10,23,22,21,18,19,17,20,21,14,9,20,10,22,14,12,21,20,23,21,20,23,15,27,20,8,15,25,25,27,14,20,3)
+
+EpiCurve <- data.frame(table(Time))
+I        <- EpiCurve$Freq[1:which(EpiCurve$Freq==max(EpiCurve$Freq))] # incidence curve (exponential phase)
+plot(I, type="l")
+
+t = 1:length(I)
+
+growth.rate <- lm(log(I) ~ t)
+r <- coef(growth.rate)[2]
+
+distr.r <- c()
+Nresamples <- 5000
+progressbar <- txtProgressBar(min = 0, max = Nresamples, style = 3)
+for (j in 1:Nresamples){
+  set.seed(j*245+98)
+  m <- runif(1, min(Savetheta[,1]), max(Savetheta[,1]))  
+  v <- runif(1, min(Savetheta[,2]), max(Savetheta[,2]))     
+  distr.r <- c(distr.r, exp(r*m-0.5*r^2*v))
+  setTxtProgressBar(progressbar, j)
+}
+close(progressbar)
+
+quantile(distr.r, c(0.025, 0.5, 0.975))
 
 
