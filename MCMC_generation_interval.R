@@ -210,7 +210,7 @@ hist(xs)
 mean(xs); quantile(xs, c(0.025,0.5,0.975))
 sd(xs)
 
-# Proportion asymptomatic transmission
+# Proportion pre-symptomatic transmission
 
 n=1000
 
