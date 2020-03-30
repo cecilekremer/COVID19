@@ -193,6 +193,11 @@ for(b in 1:NRuns){
 close(progressbar)
 proc.time() - ptm
 
+# posterior medians
+median(Savetheta[,1], na.rm = T); quantile(Savetheta[,1], c(0.025, 0.5, 0.975)) # mean GI
+median(sqrt(Savetheta[,2]), na.rm = T); quantile(sqrt(Savetheta[,2]), c(0.025, 0.5, 0.975)) # sd GI
+median(sqrt(Savetheta[,5]), na.rm=T); quantile(sqrt(Savetheta[,5]), c(0.025, 0.5, 0.975)) # sd SI
+
 
 #####################
 ## SERIAL INTERVAL ##
